@@ -39,6 +39,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
@@ -60,6 +61,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mdb27.holybible.data.Book
 import com.mdb27.holybible.model.LastReadModel
@@ -90,12 +95,11 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
 
     val focusRequester = remember { FocusRequester() }
 
-    var showGotoDialog by remember {
-        mutableStateOf(false)
-    }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-
-    BackHandler(onBack = onNavigateBack(mode, viewModel, pos, onBack))
+    BackHandler(onBack = {
+        onNavigateBack(mode, viewModel, pos, onBack)
+    })
 
     LaunchedEffect(lastRead) {
         scope.launch {
@@ -107,12 +111,30 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
         }
     }
 
+    DisposableEffect(lifecycleOwner) {
+
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_DESTROY) {
+                viewModel.onEvent(ContentEvent.OnUpdateLastRead(pos))            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+
+    }
+
+
+
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
                     IconButton(
-                        onClick = onNavigateBack(mode, viewModel, pos, onBack),
+                        onClick = {
+                            onNavigateBack(mode, viewModel, pos, onBack)
+                        },
                         content = {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -139,15 +161,6 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
                         )
                         SideEffect {
                             focusRequester.requestFocus()
-                        }
-                    } else {
-                        currentBook?.let {
-                            Text(
-                                modifier = Modifier.clickable {
-                                    showGotoDialog = true
-                                },
-                                text = it.title
-                            )
                         }
                     }
 
@@ -255,11 +268,7 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
             )
         }
     ) {
-//        if (showGotoDialog) {
-//            GotoDialog(onDismiss = {
-//                showGotoDialog = false
-//            }, currentBook!!)
-//        }
+
         LazyColumn(modifier = Modifier.padding(it), state = listState) {
 
 
@@ -373,13 +382,12 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
     }
 }
 
-@Composable
 private fun onNavigateBack(
     mode: UiMode,
     viewModel: ContentViewModel,
     pos: LastReadModel,
     onBack: () -> Unit
-): () -> Unit = {
+){
     when (mode) {
         UiMode.SELECT -> {
             viewModel.onEvent(ContentEvent.OnUpdateLastRead(pos))
