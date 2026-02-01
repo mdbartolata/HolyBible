@@ -104,18 +104,40 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
     LaunchedEffect(lastRead) {
         scope.launch {
             lastRead?.let {
+
                 listState.scrollToItem(it.pos, it.offset)
+
                 Log.e("TAG", "Content: $pos")
             }
 
         }
     }
 
+    LaunchedEffect(mode) {
+
+        if (mode != UiMode.DEFAULT) return@LaunchedEffect
+
+        scope.launch {
+            lastRead?.let {
+
+                listState.scrollToItem(it.pos, it.offset)
+
+                Log.e("TAG", "Content: $pos")
+            }
+
+        }
+
+    }
+
     DisposableEffect(lifecycleOwner) {
 
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_DESTROY) {
-                viewModel.onEvent(ContentEvent.OnUpdateLastRead(pos))            }
+                if (mode != UiMode.FILTER) {
+                    viewModel.onEvent(ContentEvent.OnUpdateLastRead(pos))
+                    Log.e("DisposableEffect", "Content: pos updated!", )
+                }
+            }
         }
 
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -390,7 +412,6 @@ private fun onNavigateBack(
 ){
     when (mode) {
         UiMode.SELECT -> {
-            viewModel.onEvent(ContentEvent.OnUpdateLastRead(pos))
             viewModel.onEvent(ContentEvent.OnCancelSelection)
             viewModel.onEvent(ContentEvent.OnSelectUiMode(UiMode.DEFAULT))
         }
@@ -401,13 +422,11 @@ private fun onNavigateBack(
         }
 
         UiMode.FILTER -> {
-            viewModel.onEvent(ContentEvent.OnUpdateLastRead(pos))
             viewModel.onEvent(ContentEvent.OnCancelSelection)
             viewModel.onEvent(ContentEvent.OnSelectUiMode(UiMode.DEFAULT))
         }
 
         UiMode.SEARCH -> {
-            viewModel.onEvent(ContentEvent.OnUpdateLastRead(pos))
             viewModel.onEvent(ContentEvent.OnSelectUiMode(UiMode.DEFAULT))
             viewModel.onEvent(ContentEvent.OnClearSearchState)
         }
@@ -417,45 +436,4 @@ private fun onNavigateBack(
 }
 
 
-@Composable
-fun GotoDialog(onDismiss: () -> Unit, currentBook: Book) {
-    val categoryOptions = listOf(
-        SegmentedButtonCategoryItem("Old Testament", 1),
-        SegmentedButtonCategoryItem("New Testament", 2)
-    )
-    var selectedIndex by remember {
-        mutableIntStateOf(currentBook.category - 1)
-    }
-
-
-    Dialog(onDismissRequest = onDismiss) {
-        Card {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                SingleChoiceSegmentedButtonRow {
-                    categoryOptions.forEachIndexed { index, option ->
-                        SegmentedButton(
-                            shape = SegmentedButtonDefaults.itemShape(
-                                index = index,
-                                count = categoryOptions.size
-                            ),
-                            selected = index == selectedIndex,
-                            onClick = {
-                                selectedIndex = index
-                            },
-                            label = {
-                                Text(option.label)
-                            }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
