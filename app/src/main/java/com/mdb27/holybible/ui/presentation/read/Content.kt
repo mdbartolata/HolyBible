@@ -6,10 +6,7 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,7 +23,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.SavedSearch
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,9 +30,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -46,11 +39,9 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
@@ -61,13 +52,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mdb27.holybible.data.Book
 import com.mdb27.holybible.model.LastReadModel
 import com.mdb27.holybible.ui.theme.cinzelFontFamily
 import com.mdb27.holybible.ui.theme.customColors
@@ -190,7 +178,6 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
 
                 },
                 actions = {
-
                     when (mode) {
                         UiMode.SELECT -> {
                             IconButton(
@@ -213,7 +200,7 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
                                     Icon(
                                         imageVector = Icons.Default.FilterListOff,
                                         contentDescription = "Filter List",
-                                        tint = Color.Yellow
+                                        tint = Color.Companion.Yellow
                                     )
                                 }
                             )
@@ -231,8 +218,12 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
 
                             IconButton(
                                 onClick = {
+                                    viewModel.onEvent(
+                                        ContentEvent.OnUpdateLastRead(
+                                            LastReadModel(pos.pos, pos.offset)
+                                        )
+                                    )
                                     viewModel.onEvent(ContentEvent.OnSelectUiMode(UiMode.FILTER))
-
                                 },
                                 content = {
                                     Icon(
@@ -288,20 +279,21 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
                             IconButton(
                                 enabled = searchState.enableNav,
                                 onClick = {
-                                    scope.launch {
-                                        viewModel.onEvent(ContentEvent.OnUpdateLastRead(
-                                            LastReadModel(pos.pos, pos.offset)))
-                                        onNavigateBack(mode,viewModel, pos, onBack)
-                                    }
+                                    viewModel.onEvent(
+                                        ContentEvent.OnUpdateLastRead(
+                                            LastReadModel(pos.pos, pos.offset)
+                                        )
+                                    )
+                                    onNavigateBack(mode, viewModel, pos, onBack)
                                 }
                             ) {
                                 Icon(
-                                    imageVector =  Icons.Default.SavedSearch,
-                                    contentDescription = "Save search position")
+                                    imageVector = Icons.Default.SavedSearch,
+                                    contentDescription = "Save search position"
+                                )
                             }
                         }
                     }
-
                 }
             )
         }
