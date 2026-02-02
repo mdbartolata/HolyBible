@@ -124,7 +124,7 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
             if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_DESTROY) {
                 if (mode != UiMode.FILTER) {
                     viewModel.onEvent(ContentEvent.OnUpdateLastRead(pos))
-                    Log.e("DisposableEffect", "Content: pos updated!", )
+                    Log.e("DisposableEffect", "Content: pos updated!")
                 }
             }
         }
@@ -185,6 +185,11 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
                                     Icon(imageVector = Icons.Default.Add, "Add Mark")
                                 },
                                 onClick = {
+                                    viewModel.onEvent(
+                                        ContentEvent.OnUpdateLastRead(
+                                            LastReadModel(pos.pos, pos.offset)
+                                        )
+                                    )
                                     viewModel.onEvent(ContentEvent.OnMarkedSelectedScripture)
                                 }
                             )
@@ -313,7 +318,7 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
                     ListItem(headlineContent = {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                             text = "Chapter $k",
+                            text = "Chapter $k",
                             fontFamily = cinzelFontFamily,
                             style = MaterialTheme.typography.headlineMedium,
                             textAlign = TextAlign.Center
@@ -333,12 +338,13 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
                     val highLightColor =
                         if (s.isMarked) MaterialTheme.customColors.highlight else MaterialTheme.colorScheme.surface
 
-                    val highLightChapVerseColor = if (s.isMarked) MaterialTheme.customColors.highlight2 else MaterialTheme.colorScheme.surface
+                    val highLightChapVerseColor =
+                        if (s.isMarked) MaterialTheme.customColors.highlight2 else MaterialTheme.colorScheme.surface
                     val textColor =
                         if (s.isMarked) Color.Black else MaterialTheme.colorScheme.onSurface
 
 
-                    val textModifier = if (s.isMarked)  Modifier
+                    val textModifier = if (s.isMarked) Modifier
                         .clip(RoundedCornerShape(10))
                         .background(highLightColor)
                         .padding(horizontal = 3.dp) else Modifier
@@ -346,7 +352,7 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
                         .padding(horizontal = 3.dp)
 
 
-                    val chapVerseModifier = if (s.isMarked)  Modifier
+                    val chapVerseModifier = if (s.isMarked) Modifier
                         .clip(RoundedCornerShape(25))
                         .background(highLightChapVerseColor)
                         .padding(horizontal = 3.dp) else Modifier
@@ -417,7 +423,7 @@ private fun onNavigateBack(
     viewModel: ContentViewModel,
     pos: LastReadModel,
     onBack: () -> Unit
-){
+) {
     when (mode) {
         UiMode.SELECT -> {
             viewModel.onEvent(ContentEvent.OnCancelSelection)
