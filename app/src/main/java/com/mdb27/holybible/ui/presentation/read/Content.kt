@@ -104,16 +104,20 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
 
     LaunchedEffect(mode) {
 
-        if (mode != UiMode.DEFAULT) return@LaunchedEffect
+        if (mode == UiMode.DEFAULT) {
 
-        scope.launch {
-            lastRead?.let {
+            scope.launch {
+                lastRead?.let {
 
-                listState.scrollToItem(it.pos, it.offset)
+                    listState.scrollToItem(it.pos, it.offset)
 
-                Log.e("TAG", "Content: $pos")
+                }
+
             }
-
+        } else if (mode == UiMode.FILTER) {
+            scope.launch {
+                listState.scrollToItem(0, 0)
+            }
         }
 
     }
