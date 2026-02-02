@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.FilterListOff
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.SavedSearch
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -283,6 +284,21 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
                                     )
                                 }
                             )
+
+                            IconButton(
+                                enabled = searchState.enableNav,
+                                onClick = {
+                                    scope.launch {
+                                        viewModel.onEvent(ContentEvent.OnUpdateLastRead(
+                                            LastReadModel(pos.pos, pos.offset)))
+                                        onNavigateBack(mode,viewModel, pos, onBack)
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector =  Icons.Default.SavedSearch,
+                                    contentDescription = "Save search position")
+                            }
                         }
                     }
 
