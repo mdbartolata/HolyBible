@@ -125,7 +125,7 @@ class ContentViewModel(
             }
 
             is ContentEvent.OnUpdateSearchInput -> viewModelScope.launch {
-                _searchState.value = searchState.value.copy(input = e.input, enableNav = true)
+                _searchState.value = searchState.value.copy(input = e.input, enableNav = true, index = 0)
 
                 if (e.input.isBlank()) {
                     _searchState.value =
