@@ -55,6 +55,8 @@ import com.mdb27.holybible.ui.theme.cinzelFontFamily
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(
@@ -84,7 +86,13 @@ fun HomeScreen(
 
     val mimeType = "application/json"
 
-    val backupName = "hb-backup"
+    val currentDateTime = LocalDateTime.now()
+
+    val formatter = DateTimeFormatter.ofPattern("dd_MM_yyyy-HH:mm:ss")
+
+    val formattedDateTime = currentDateTime.format(formatter)
+
+    val backupName = "hb-$formattedDateTime"
 
     val writeBackupLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument(mimeType)

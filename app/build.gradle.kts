@@ -12,10 +12,10 @@ android {
 
     defaultConfig {
         applicationId = "com.mdb27.holybible"
-        minSdk = 24
+        minSdk = 29
         targetSdk = 34
         versionCode = 1
-        versionName = "1.1.5"
+        versionName = "1.1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
