@@ -67,4 +67,12 @@ interface AppDao {
     @Transaction
     @Query("SELECT * FROM scripture WHERE isMarked = 1")
     fun getAllMarkedScriptures(): List<Scripture>
+
+    @Transaction
+    @Query("delete from LastRead")
+    suspend fun deleteAllLastRead()
+
+    @Transaction
+    @Query("update Scripture set isMarked = 0 where isMarked = 1")
+    suspend fun resetMarkedScripture()
 }

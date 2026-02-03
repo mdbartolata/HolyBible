@@ -43,6 +43,8 @@ class HomeScreenViewModel(
                 event.callBack(appBackUp)
             }
             is HomeEvent.OnImportBackup -> viewModelScope.launch(Dispatchers.IO) {
+                dao.resetMarkedScripture()
+                dao.deleteAllLastRead()
                 dao.upsertScripture(event.appBackup.markedScripture)
                 dao.upsertLastRead(event.appBackup.lastRead)
                 event.callBack()
