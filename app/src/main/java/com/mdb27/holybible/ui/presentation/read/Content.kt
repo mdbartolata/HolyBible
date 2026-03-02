@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -69,7 +70,7 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
     val listState = rememberLazyListState()
     val lastRead = viewModel.lastRead.collectAsStateWithLifecycle().value
     val scope = rememberCoroutineScope()
-    val mode = viewModel.uiMode.collectAsStateWithLifecycle().value
+    val mode = viewModel.uiMode.collectAsState().value
     val pos by remember {
         derivedStateOf {
             LastReadModel(
@@ -96,7 +97,6 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
 
                 listState.scrollToItem(it.pos, it.offset)
 
-                Log.e("TAG", "Content: $pos")
             }
 
         }
@@ -122,13 +122,12 @@ fun Content(viewModel: ContentViewModel, onBack: () -> Unit) {
 
     }
 
-    DisposableEffect(lifecycleOwner) {
+    DisposableEffect(mode) {
 
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_DESTROY) {
-                if (mode != UiMode.FILTER) {
+                if (mode == UiMode.DEFAULT) {
                     viewModel.onEvent(ContentEvent.OnUpdateLastRead(pos))
-                    Log.e("DisposableEffect", "Content: pos updated!")
                 }
             }
         }

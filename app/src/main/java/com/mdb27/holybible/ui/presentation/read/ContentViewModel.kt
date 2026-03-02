@@ -87,7 +87,6 @@ class ContentViewModel(
                 pos.addAndGet(totalItemsInChapter)
             }
         }
-        Log.e("TAG", "setSearchPos: ${pos.get()}", )
         return LastReadModel(pos = pos.get())
     }
 
@@ -108,10 +107,8 @@ class ContentViewModel(
             is ContentEvent.OnSelectScripture -> viewModelScope.launch {
                 if (selectedScriptures.contains(e.scripture)) {
                     selectedScriptures.remove(e.scripture)
-                    Log.e("TAG", "onEvent: ${selectedScriptures.size}")
                 } else {
                     selectedScriptures.add(e.scripture)
-                    Log.e("TAG", "onEvent: ${selectedScriptures.size}")
                 }
             }
 

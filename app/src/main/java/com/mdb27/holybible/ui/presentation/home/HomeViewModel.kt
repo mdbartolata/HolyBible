@@ -18,7 +18,6 @@ class HomeScreenViewModel(
 ) : ViewModel() {
 
     init {
-        Log.e("TAG", ": init", )
         getMarkedContent()
     }
 
@@ -57,7 +56,6 @@ class HomeScreenViewModel(
 
     private fun getMarkedContent() = viewModelScope.launch(Dispatchers.IO) {
         val marked = dao.getAllMarkedScriptures()
-        Log.e("TAG", "getMarkedContent: $marked", )
     }
 
 }

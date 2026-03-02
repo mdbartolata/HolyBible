@@ -4,6 +4,7 @@ package com.mdb27.holybible
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -198,7 +199,9 @@ class MainActivity : ComponentActivity() {
                             else -> {
                                 Scaffold {
                                     Box(
-                                        modifier = Modifier.padding(it).fillMaxSize(),
+                                        modifier = Modifier
+                                            .padding(it)
+                                            .fillMaxSize(),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         CircularProgressIndicator()
